@@ -177,7 +177,18 @@ object Cancer {
 
     val accuracy = evaluator.evaluate(predictions)
     println("accuray : "+accuracy)
+    /******************
+      * common matric used for logistic regression is area under the ROC curve(AUC).
+      * We can use BinaryClassificationEvaluator to obtain AUC.
+      * Create an Evaluator for BinaryClassification, which expects two input columns: rawPrediction and label.
+      *
 
+    *******************/
+    val evaluator_tow = new BinaryClassificationEvaluator().setLabelCol("label")
+      .setRawPredictionCol("rawPrediction")
+      .setMetricName("areaUnderROC")
+    val accuracy_two = evaluator_tow.evaluate(predictions)
+    println("accuracy with rawPrediction and label : "+accuracy_two)
   }//end of main
 }
 
