@@ -1,6 +1,9 @@
+//import breeze.linalg.DenseVector
 import org.apache.spark.ml.classification.{BinaryLogisticRegressionSummary, LogisticRegression}
 import org.apache.spark.ml.evaluation.BinaryClassificationEvaluator
 import org.apache.spark.ml.feature.{StringIndexer, VectorAssembler}
+import org.apache.spark.ml.linalg.DenseVector
+import org.apache.spark.mllib.evaluation.BinaryClassificationMetrics
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
@@ -42,7 +45,7 @@ object Cancer {
       .master("local")
       .appName("stock")
       .getOrCreate()
-
+    spark.sparkContext.setLogLevel("ERROR") // TO remove vervose INFO message when run the program.
     val rdd =spark.sparkContext.textFile("C:\\scala_coursera\\data\\wbcd.csv")
 
     /*before Spark 2.x using:  val conf = new SparkConf() , val sc = SparkContext(conf)
@@ -189,6 +192,38 @@ object Cancer {
       .setMetricName("areaUnderROC")
     val accuracy_two = evaluator_tow.evaluate(predictions)
     println("accuracy with rawPrediction and label : "+accuracy_two)
+    /*****************
+      * true positive :
+      * lp.filter($"prediction" === 0.0).filter($"label" === $"prediction").count()
+      * true negative :
+      * False positive : actual No, predict Yes :
+      * lp.filter($"prediction" === 1.0).filter(not($"label" === $"prediction")).count()
+      * False negative             : actual Yes , predict No :
+      * lp.filter($"prediction" === 0.0).filter(not($"label" === $"prediction")).count()
+      * ********************* */
+
+    val lp = predictions.select( "label", "prediction")
+    val counttotal = predictions.count()
+    val correct = lp.filter($"label" === $"prediction").count()
+    val wrong = lp.filter(!($"label" === $"prediction")).count()
+    val truep = lp.filter($"prediction" === 0.0).filter($"label" === $"prediction").count()
+    val falseN = lp.filter($"prediction" === 0.0).filter(!($"label" === $"prediction")).count()
+    val falseP = lp.filter($"prediction" === 1.0).filter(!($"label" === $"prediction")).count()
+    val ratioWrong=wrong.toDouble/counttotal.toDouble
+    val ratioCorrect=correct.toDouble/counttotal.toDouble
+    println(s"correct : $correct , wrong: $wrong, truePosive: $truep , falseN : $falseN" )
+    println(s"ratioWrong : $ratioWrong, ratioCorrect : $ratioCorrect")
+
+    // use MLlib to evaluate, convert DF to RDD
+/*  A Precision-Recall curve plots (precision, recall) points for different threshold values,
+ while a receiver operating characteristic, or ROC, curve plots (recall, false positive rate) points.
+  The closer  the area Under ROC is to 1, the better the model is making predictions.
+  */
+
+    val  predictionAndLabels =predictions.select("rawPrediction", "label").rdd.map(x => (x(0).asInstanceOf[DenseVector](1), x(1).asInstanceOf[Double]))
+    val metrics = new BinaryClassificationMetrics(predictionAndLabels)
+    println("area under the precision-recall curve: " + metrics.areaUnderPR)
+    println("area under the receiver operating characteristic (ROC) curve : " + metrics.areaUnderROC)
   }//end of main
 }
 
