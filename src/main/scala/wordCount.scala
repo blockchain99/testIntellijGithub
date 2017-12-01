@@ -6,13 +6,14 @@ object wordCount {
       .master("local")
       .appName("wordcound")
       .getOrCreate()
+    spark.sparkContext.setLogLevel("ERROR")// remove INFO message during run-time
     val lines = spark.sparkContext.textFile(
       "C:\\scala_coursera\\lec4_Big Data Analysis with Scala and Spark\\1\\testIntellijGithub\\src\\main\\data\\twinkle\\sample.txt")
     val word = lines
       .flatMap(line => line.split(" "))
       .map(word => (word, 1))
       .reduceByKey(_+_)
-    print("word : "+word)
+    println("------- word : "+word)
 
     val totalChar = lines
       .map(_.length)
@@ -23,8 +24,5 @@ object wordCount {
     val result2 = lines
       .map(x => (x.split(" ")(0), x))
     println("**** result2 :"+result2)
-
-
   }
-
 }
