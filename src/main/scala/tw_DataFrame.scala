@@ -26,6 +26,7 @@ object tw_DataFrame {
     println()
     println(" ***** line count of file : "+lines.count)   //RDD
     println(" ***** first line of file : "+lines.first)   //RDD
+    println("version : 20171201")
   }
 
 }
