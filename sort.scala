@@ -1,14 +1,17 @@
 
 /*Quick sort  */
 object firstQuckSort{
+
   def main(args: Array[String]): Unit = {
+
   def sort(xs: Array[Int]) {
     def swap(i: Int, j: Int) {
       val t = xs(i); xs(i) = xs(j); xs(j) = t
     }
-    def sort1(l: Int, r: Int) {
-      val pivot = xs((l + r) / 2)
-      var i = l; var j = r
+
+    def sort1(left: Int, right: Int) {
+      val pivot = xs((left + right) / 2)
+      var i = left; var j = right
       while (i <= j) {
         while (xs(i) < pivot) i += 1
         while (xs(j) > pivot) j -= 1
@@ -18,9 +21,10 @@ object firstQuckSort{
           j -= 1
         }
       }
-      if (l < j) sort1(l, j)
-      if (j < r) sort1(i, r)
+      if (left < j) sort1(left, j)
+      if (j < right) sort1(i, right)
     }
+
     sort1(0, xs.length - 1)
   }
 
