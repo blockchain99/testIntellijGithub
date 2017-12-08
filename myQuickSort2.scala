@@ -18,7 +18,7 @@ object myQuickSort2 {
         }
       }
       swap(i + 1, high)
-      i + 1
+      i + 1  //return new pivot index
       //return i+1 //same as above
     }
 
@@ -28,8 +28,8 @@ object myQuickSort2 {
 //        /*a[partionInde] is now at right place  */
 //        var partitionIndex = partition(a, low, high)
         /*recursively sort elements before partition and after partition  */
-        sort(a, low, partition(a, low, high) - 1)
-        sort(a, partition(a, low, high) + 1, high)
+        sort(a, low, partition(a, low, high) - 1)  //sort Array on the left of pivot
+        sort(a, partition(a, low, high) + 1, high) //sort Array on the right of pivot
       }
     }
   def main(args: Array[String]): Unit = {
